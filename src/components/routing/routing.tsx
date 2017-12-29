@@ -2,6 +2,9 @@ import * as React from "react";
 import {history} from "../../store/store";
 import {Route, Router} from "react-router";
 import {Home} from "../home";
+import {RegisterPage} from "../user/register/register.page";
+import {LoginPage} from "../user/login/login.page";
+import {userIsAuthenticated, userIsNotAuthenticated} from "./authentication";
 
 class RouteModel {
     path: string;
@@ -15,26 +18,39 @@ class RouteModel {
     }
 }
 
-const routes: RouteModel[] = [
-    new RouteModel("/", true, Home)
+const authenticatedRoutes: RouteModel[] = [
+    new RouteModel("/", true, Home),
+];
+
+const unauthenticatedRoutes: RouteModel[] = [
+    new RouteModel("/register", false, RegisterPage),
+    new RouteModel("/login", false, LoginPage)
 ];
 
 export const Routing = () => {
-    const routeComponents = routes.map((route, index) => (
+    const authenticatedRouteComponents = authenticatedRoutes.map((route, index) => (
         <Route
             key={index}
             exact={route.exact}
             path={route.path}
-            component={route.component}
+            component={userIsAuthenticated(route.component)}
         />
     ));
 
-    console.log(routeComponents);
+    const unauthenticatedRouteComponents = unauthenticatedRoutes.map((route, index) => (
+       <Route
+        key={index}
+        exact={route.exact}
+        path={route.path}
+        component={userIsNotAuthenticated(route.component)}
+       />
+    ));
 
     return (
         <Router history={history}>
             <div>
-                {routeComponents}
+                {authenticatedRouteComponents}
+                {unauthenticatedRouteComponents}
             </div>
         </Router>
     )
